@@ -37,13 +37,22 @@ resource "azurerm_postgresql_flexible_server" "this" {
   administrator_password = "HelloPgFlex123$"
   zone                   = "1"
 
-#   customer_managed_key {
-#     key_vault_key_id = azurerm_key_vault_key.this.id
-#     primary_user_assigned_identity_id = azurerm_user_assigned_identity.pgclient.id
-#   }
+  identity {
+    type = "UserAssigned"
+    identity_ids = [azurerm_user_assigned_identity.pgserver.id]
+  }
+
+  customer_managed_key {
+    key_vault_key_id = azurerm_key_vault_key.this.id
+    primary_user_assigned_identity_id = azurerm_user_assigned_identity.pgserver.id
+  }
 
   storage_mb = 32768
 
   sku_name   = "B_Standard_B1ms"
-  depends_on = [azurerm_key_vault_key.this, azurerm_user_assigned_identity.pgclient, azurerm_private_dns_zone_virtual_network_link.this]
+  depends_on = [azurerm_subnet.this, 
+                azurerm_key_vault_key.this, 
+                azurerm_user_assigned_identity.pgclient, 
+                azurerm_user_assigned_identity.pgserver, 
+                azurerm_private_dns_zone_virtual_network_link.this]
 }
