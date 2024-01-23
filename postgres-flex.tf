@@ -33,8 +33,8 @@ resource "azurerm_postgresql_flexible_server" "this" {
   version                = "15"
   delegated_subnet_id    = azurerm_subnet.this.id
   private_dns_zone_id    = azurerm_private_dns_zone.this.id
-  administrator_login    = "pgadmin"
-  administrator_password = "HelloPgFlex123$"
+  administrator_login    = ""
+  administrator_password = ""
   zone                   = "1"
 
   identity {
