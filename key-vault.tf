@@ -1,4 +1,4 @@
-resource "azurerm_key_vault" "example" {
+resource "azurerm_key_vault" "this" {
   name                        = "${local.prefix}-keyvault"
   location                    = azurerm_resource_group.this.location
   resource_group_name         = azurerm_resource_group.this.name
@@ -14,9 +14,14 @@ resource "azurerm_key_vault" "example" {
     object_id = data.azurerm_client_config.current.object_id
 
     key_permissions = [
+      "Create",
+      "Delete",
       "Get",
-      "List",
-      "Create"
+      "Purge",
+      "Recover",
+      "Update",
+      "GetRotationPolicy",
+      "SetRotationPolicy"
     ]
 
     secret_permissions = [
@@ -30,5 +35,30 @@ resource "azurerm_key_vault" "example" {
       "List",
       "Set"
     ]
+  }
+}
+
+resource "azurerm_key_vault_key" "this" {
+  name         = "${local.prefix}-keyvault-key"
+  key_vault_id = azurerm_key_vault.this.id
+  key_type     = "RSA"
+  key_size     = 2048
+
+  key_opts = [
+    "decrypt",
+    "encrypt",
+    "sign",
+    "unwrapKey",
+    "verify",
+    "wrapKey",
+  ]
+
+  rotation_policy {
+    automatic {
+      time_before_expiry = "P30D"
+    }
+
+    expire_after         = "P90D"
+    notify_before_expiry = "P29D"
   }
 }

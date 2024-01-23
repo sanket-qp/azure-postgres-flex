@@ -1,8 +1,8 @@
-data "azurerm_subnet" "this" {
-  name                 = "${local.prefix}-private-subnet-1"
-  virtual_network_name = "${local.prefix}-vnet"
-  resource_group_name  = azurerm_resource_group.this.name
-}
+# data "azurerm_subnet" "this" {
+#   name                 = "${local.prefix}-private-subnet-1"
+#   virtual_network_name = "${local.prefix}-vnet"
+#   resource_group_name  = azurerm_resource_group.this.name
+# }
 
 resource "azurerm_public_ip" "this" {
   name                = "${local.prefix}-public-ip"
@@ -36,7 +36,8 @@ resource "azurerm_network_interface" "this" {
 
   ip_configuration {
     name                          = "${local.prefix}-ipconfig"
-    subnet_id                     = data.azurerm_subnet.this.id
+    # subnet_id                     = data.azurerm_subnet.this.id
+    subnet_id                     = azurerm_virtual_network.this.subnets[0]
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.this.id
   }
@@ -85,6 +86,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 
   depends_on = [
+    azurerm_virtual_network.this,
     azurerm_user_assigned_identity.pgclient,
     azurerm_network_interface.this,
     tls_private_key.this
